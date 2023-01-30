@@ -1,0 +1,285 @@
+﻿Defect Desciption,,,,,,,,,,,,,Details of Developer,,,From Development Team,,,,,,,,,,From Test Team,,,,,,
+Item Id,Submit Date,Title,Description,Phase Found,State,Severity,Module/Device Type Text,Module/Device Varient,OIC Team Default,Software Version,Defect Owner,Associated Prj,Name,"Organisation
+[e.g. LTA-FS,
+LTA-FS-Insource,
+MSI, IBM, etc]",Remark,Development Lead,What happened?,Are related requirements recorded in the BR or UCS?,"If prior response is ""Yes"", list down the BR or UCS document number(s) and clause identifier(s)",Why was defect introduced?,What could have been done to avoid introduction of defect?,Primary Root Cause Classification #1,Primary Root Cause Classification #2,Remark,Proposed solution to prevent recurrence,Test Lead,Why defect was not identifierd during testing?,Are related requirements recorded in the BR or UCS?,"If prior response is ""Yes"", list down the BR or UCS document number(s) and clause identifier(s)",Primary Root Cause Classification #3,Remark,Proposed solution to prevent recurrence
+DEF016683,4/3/2022,INC_00023776 - TA Deferred Refund - error encountered in pass approval and view DR,"Test Steps:
+ 
+Expected Result:
+ 
+Actual Result:
+",Production,Closed,CAT B,Application,CMSE,BOS,TA.EE.39.01.00.R2,Samson Siu Chun Wai,BS-39,,LTA-FS-Insource,,samson,"Due to SS Ext, WAS8 was upgraded to WAS9. Data type no longer supported in WAS9. As a result, GUI to approve Deferred Refund for pass failed.",No,,"Due to SS Ext, WAS8 was upgraded to WAS9. Data type no longer supported in WAS9. As a result, GUI to approve Deferred Refund for pass failed.",More extensive testing should be conducted whenever middleware is upgraded,Vendor Product,Product Limitation,,More extensive testing required to uncover compatibility issues whenever there is major middleware upgrade,"RS138 Test Lead - Jessie Chua
+BS39 Test Lead - Esther Ong
+
+","Test cases was not chosen in all tiers for concession/period pass based on the impact analysis or base test cases
+",Yes,L1081/SYS/BRUL/036,"RS138 & BS39
+The impact was documented in RS138 ""CBT External Interfaces and Data Transferred Between Systems_6Jan2022.xls"" for discussion in RS138 progress meeting.
+
+Root Cause for missing test case
+As full testing needs much more time than the representative testing for the system upgrades, test cases were chosen based on the impact to the underlying middleware and interfaces. As the middleware in all tiers are the same, regression test case for Deferred refund test case on Card manager was chosen but not on Transit acquirer.",,"Test Activities (BS & RS)
+Formalise the details of RS/BS changes and circulated to both for information.  Exchange information shall be conducted periodically.
+
+Test Design (RS & BS)
+To review regression test cases based on:
+     1. Business Facing
+     2. Evaluate Product
+to ensure better test coverage.
+
+Strengthen the impact analysis, regression test cases selection and request for the time needed from Project team to execute the chosen test cases."
+DEF016763,23/3/2022,PWD/WTCS Concession Pilot Users PWD fare is charged even though ticket type 2 is adult fare.,"Test Steps:
+ 
+Expected Result:
+ 
+Actual Result:
+",Production,Closed,CAT B,TABA Application,TABA.TXNP,BOS,TABA.OLTP.39.01.02,Raghu Kishore,BS-39,,LTA-FS-Insource,,samson,did not stamp the ticket type 2 correctly,No,,"at the time of implementation, there were no concession cards available for testing, thus testing were mainly on Adult Anonymous cards. There was also insufficient testing on boundary conditions.",Need to consider boundary conditions when developing test cases.,Requirement [Software],Logic Error,,Need to consider boundary conditions when developing test cases.,Esther Ong,Test cases was not chosen based on the impact analysis.  ,Yes,,Missing Test Case,,"To increase test coverage for concession card 
+"
+DEF016766,24/3/2022,[BS39] - CT-CC - Devices allow to buy concession pass for more than the concession validity period,"Test Steps:
+1. Set the ticket type 1 to expire on the same day of the pass purchase (system date)
+2. place the card, select Buy Concession pass option.
+ 
+Expected Result:
+Device only allow to show pass start date selection not later than concession validity date. 
+
+
+Actual Result:
+Device show pass start date selection later than concession validity date.
+",Production,Closed,CAT B,GTM,CTK,DMT,TK.C.09.18.01,Roy Wong Wui Hsien,BS-39,Vibhor,LTA-FS-Insource,,Roy Wong,device allow buy concession pass even the ticket expiry almost end. The concession pass shall be prorated.,Y,fp17001-epd-dd-004-abt-ticket_services_implementation_guide.doc,"implementation error, wrong information provided in BR function which lead to pass purchase is not pro-rated.",design principal of ticket validity shall be explain and understood by the developer. ,,,,review of test case created by developer and use common set of test case across the device supporting the same function.,Esther Ong,Test cases was not chosen based on the impact analysis.  ,Yes,,Missing Test Case,,"To increase test coverage for concession card
+"
+DEF016770,29/3/2022,INC_00024000 : SMRT : Nets inventory is showing inaccuracy information : mo,"Nets inventory is showing inaccuracy information after upgrade to BS39 software.
+
+=== Notes===
+NETS did not insert NULL to terminate end of entry in the parameter.
+PSM Reads up to 30 bytes.
+Within these 30 bytes, if there are unused entries PSM will display as ‘0’s
+Current workaround is to update Parameter to terminate entry with NULL.",Production,Closed,CAT B,PSM,PSM 4,DMT,P.F.01.04.00,Ba Yang,BS-39,Ba Yang,LTA-FS,,Roy Wong,Display string is not terminated properly on a NETS parameter which causing the GUI show incorrect entry on the inventory.,No,,"1. The parameter data definition doesn't provide proper definition on how the data field should be coded by NETS. NETS is coding remaining field as all 0s and it is not terminated with NULL.
+2. When PSM read the parameter, it doesn't only read out the 30 bytes data size defined which causing the undesired GUI display on the screen. ","1. When issue first identify, the specification shall be clarify and ensure all party follow the spec correctly. 
+2. coding practice of copying data from the source should always be guarded with pre-define size.",Design [SA],Logic Error,,design guideline and coding practice to update on data copy best practice.,Esther Ong,Issue not observed in Test Lab.,Yes,,Test & Production Environment Difference,,To in-synch FT parameters with production parameters.
+DEF016775,31/3/2022,[ABT][SYSS]EOD0000331 job doesn't have dependency check on EOD0000413 job - Nancy,"Test Steps:
+
+
+1. Ensure EOD0000413(CTC Posting Request EOD job - child job of EOD0000101) is not completed.
+2. Run EOD0000104 job (Master PBA EOD)
+3. Verify if EOD0000331(CTC Posting Summary for Apportionment EOD) is completed
+ 
+Expected Result:
+EOD0000331 should not run if EOD0000413 job is not completed.
+ 
+Actual Result:
+ EOD0000331 ran successfully though EOD0000413 job is not completed. 
+
+",Production,Scheduled,CAT B,TABA Application,TABA.SYSS,BOS,NA,Gilbert De Los Santos,BS-39,Ganga Prasad,LTA-FS-Insource,Ganga Prasad is no longer with FS,Gilbert de los Santos,"EOD-331 depends on Data generated by EOD-413. 
+
+Due to an issue EOD-413 did not complete. Even though EOD-413 did not complete, EOD-331 continued processing.
+
+This caused discrepancy in the generated data.",No,,Dependency was not properly analyzed by the developer.,"Proper job dependency should have been identified by the developer.
+
+The dependency has been identified by the new developer. ",Design [AFC / Software],Logic Error,,"Fix has been delivered in BS40.
+
+Updated dependency of EOD-331 to include EOD-413.",Esther Ong,Issue not observed in Test Lab.,No,,Test & Production Operation Difference,,"Dev to provide root cause analysis on how the issue can be triggered.  
+We will try to enhance the test monitoring tool to reflect failure when child job is not running properly.
+"
+DEF016792,6/4/2022,ABT_STEL Xtrip files are not generated and sent to SMRT staging server_Sumathy,"Test Steps:
+ 
+STEL Xtrip files are not generated and sent to SMRT staging server.
+
+
+Expected Result:
+STEL Xtrip files should generate and sent to SMRT staging server. 
+
+    
+Actual Result:
+Due to long running of STEL XTRIP EI ETL job, files are not generated and sent to SMRT staging server.
+",Production,Open,CAT B,TABA Application,TABA.OLAP,BOS,TABA.OLAP 39.01.01,Raghu Kishore,BS-39,,LTA-FS-Insource,Insource has resigned,Sekhar Siripuram,"Technically the SQL scripts that uses to extract the Xtrip data need to opmitise, the previous queries were not using proper index fields and not using the partition data range, as well the additional conditions needed to minimise the row scan.
+Due to this the query uses longer time to fetch data before preparing the file to export.",No,,The DB queries needed performance optimisation,"After deployment to production, there should be close monitoring for a week to detect issues as non-production environment may not be able to detect the issue.",Construction,Logic Error,,"1. Detailed analysis
+2. Peer Review of the code
+3. Closer montioring in production after deployment of EI items",Esther Ong,Issue not observed in Test Lab.,No,,Test & Production Environment Difference,,"Dev to provide root cause analysis
+"
+DEF016806,7/4/2022,[ABT][INC_00024152]-Incorrect write off amount reflected for Pending Postings written off  after 5 years(expiry) - Nancy,"Test Steps:
+
+
+1. Ensure JBA Pending Settlement postings are present and about to be expired.
+2. Check whether written off amount is reflected correctly in TX_ABT_WRITEOFF table for split transactions
+ 
+Expected Result:
+Written off amount is reflected correctly in TX_ABT_WRITEOFF table for split transactions and not present in TC_PBA_WRITEOFF table.  
+
+
+Actual Result:
+ Written off amount is reflected incorrectly in TX_ABT_WRITEOFF table for split transactions and data present in TC_PBA_WRITEOFF table.  
+
+
+ 
+
+",Production,Closed,CAT B,TABA Application,TABA.SYSS,BOS,NA,Gilbert De Los Santos,BS-39,Ganga Prasad,LTA-FS-Insource,Ganga Prasad is no longer with FS,Gilbert de los Santos,"Due to incorrect query in the Journey Based Apportionment Stored Procedure, the write-off amount is incorrect.",No,,"It may have been caused by improper testing of the original developer. Developer is no longer available for discussion.
+
+We discovered that there are no automated unit tests for the stored procedure to confirm that records with split transactions were tested.","Proper testing would have prevented the issue.
+
+An automated test code would have helped flag the issue in a repeatable manner.",Construction,Logic Error,,"Fix has been delivered in BS39P2.
+
+Automated Unit test code to be introduced to prevent such issues from occurring.   ",Esther Ong,Issue not observed in Test Lab.,No,,Test & Production Operation Difference,,"Not able to simulate as PBA already activated since BS37.
+"
+DEF016808,8/4/2022,ABT PGCT - Issues with blacklist processing,"Since Jan 2022, we have encountered 4 occurrences in which pg-param-server service in PGCT was unable to process the blacklist. As a workaround, MSI is performing restart of pg-param-server whenever the issue occurs, but a permanent fix is required.",Production,Closed,CAT A,PGCT,PGCT,EPD,PGCT BS39,Wong Mun Lai,BS-39,,,,,Dorothy Pang,"Issue 1
+PGCT not receiving the blacklist from 8:00 pm 1 Jan to 3 Jan 2022
+
+Issue 2:
+There was one occurrence on 28 Mar, the pg-param-server process was unable to process delta of delta from FI, while no crashing happened.
+
+Issue 3
+There were occurrences the pg-param-server  process hung at around 8:00 pm on 4th ,6th April when full blacklist downloading from FI
+
+For issue 2 and 3,
+The impact was that subsequent blacklist messages were unable to be processed any more until restarting of pg-param-server process 
+
+",No,,"The team lacked knowledge of MQ sessions, which actually is not thread safe, thus there were no consideration of avoid accessing MQ sessions crossing threads at same time .
+Team did not anticipate the DOD and Full blacklist may receive from FI almost at same second, when more and more users migrated to CePAS Token. 
+Team did not anticipate that there were more and more blacklist  messages which easily hit maximum messages processing queue size (100). 
+The development load test did not generate the scenario of DOD and Full blacklist downloading at same time scenario, thus, did not detect this issue during the development load test.",Identify all possible load test scenarios and run them before BS delivery,Design [AFC / Software],Incomplete Impact Analysis,,,Issue not observed in Test Lab.,No,,Test & Production Environment Difference,,"To explore if can simulate / verify via automation tool based on the RCA.
+"
+DEF016815,8/4/2022,"TLTO : RS126: TAM TUK-A entering ""OOS"" mode after software upgrading is completed : mo","TL was performing software upgrade for TAM TUK-A U02, U03 and U04 when this incident occurred. After kiosk has finished performing auto-reboot as part of the software upgrading process, kiosk will go from ""Closed"" mode into ""Out of Service"" mode. Onsite staff have reported that there were no error codes seen onsite, software version displayed at the bottom of kiosk screen is the correct software version deployed to it.
+
+Event history show that before there was ""Critical Parameter Incomplete"" event log before ""Out of Service (Fault)"". Only U03 and U04 did displayed ""Fault Condition: Missing Parameter"" and ""Parameter Status: Incomplete (Critical)"" on single device status page. All 3 kiosks were able to be resolved by performing remote reboot.
+
+Kiosk was being upgraded from 01.03.03 to 01.04.04, please help us investigate, thank you.",Production,Prioritize Defect,CAT B,TUM,TUKA,EPD,01.03.03 TO 01.04.04,Roy Wong Wui Hsien,BS-39,,Murugaiyan,MSI,,Roy Wong,"Unexpected scenario case which is not handle by device.
+Multiple Application Parameter version pushing down to device, when device performing application upgrade, the version changed which cause device fall into exceptional case and consider parameter not available in device. 
+This Application parameter is classify as critical parameter. 
+Hence, device go into OOS mode. A remote reboot will recover the device.",No,,The current design unable to handle a scenario where parameter version changed during software upgrade..,enhancement required to handle this exception scenario.,Design [Software],Missing Design,,"when upgrade device application, ensure that the previous version upgraded properly before push a new version to the device.",Test case not performed,No,,Missing Test Case,,To ensure tester include the test case during execution
+DEF016835,20/4/2022,[ABT][CSRV]TL/EZL cannot do deferred refund for passes for CTC cards between 12am - 8am,"Test Steps:
+ 
+1.Check whether TB03U inquiry is successful when fired during 12AM-8AM.
+
+
+Expected Result:
+
+
+
+TB03U is successful.
+ 
+Actual Result:
+
+
+TB03U failed with error 400 (Bad request)
+",Production,Scheduled,CAT B,TABA Application,TABA.CSRV,BOS,NA,Samson Siu Chun Wai,BS-39,,LTA-FS-Insource,,samson,overlook conversion of timezone when processing datetime field,No,,"Did not use the api correctly. This is the first time using JSON API, thus not familiar with the usage of the api",get more understanding of the api before using,Requirement [Software],Logic Error,,get more understanding of the api before using,Esther Ong,Test cases was not chosen based on the impact analysis.  ,No,,DR can only performed in TL device. Need TL and EZL support for DR testing.,,Might need TL / EZL to add test cases for DR filing at different timing.
+DEF016864,28/4/2022,FARE_BAND_TO_CASH_FARE_MAPPING and Bus Cash Fare Table generation issue,"Parameter generation wrong for above mentioned parameter is wrong,
+",Production,Closed,CAT B,TABA Application,TABA.PRMS,BOS,BFC.A.05.22.00,Xu Guoneng,BS-39,Si Thu,LTA-FS-Insource,Insource has resigned,Xu Guoneng,Parameter blobs generated by one Service Provider may contain records from other Service Provider if they happen to have the same version no.,No,,"1. we only have one BO (SBST) set up in dev1 TABA, which makes it difficult to identify this type of issue as it requires more than one BOs to have overlapping version no.
+2. the database of the developer's local machine contains overlapping version but their contents are identical (simply copy & paste), ends up such exceptional case are not identified during local testing
+3. The development effort for this BS39 Param Migration RFE is severely underestimated, resulting in insufficient testing to identify issue","As this defect can only occur in a multi-tenant environment, we could procure more infra resources to create configurations for other BOs to dev1 TABA so developers can test other BOs instead of just SBST BO. Alternatively, more scenario testing could be done during UAT environment.
+
+
+",Construction,Logic Error,,"Include filtering by Service Provider. Replicate FT ABT parameter data to dev1 for all BOs and ROs. Compare generated files from CBT and ABT to confirm.
+",Esther Ong,Test cases was not chosen based on the impact analysis.  ,No,,Test & Production Environment Difference,,"Need dev to advise or highlight the impacted area.
+Will add test cases for same bus svc number in different SPID once the FT parameters sync-ed up with production parameters."
+DEF016865,29/4/2022,Titan C does not download AG_CFG Parameter,"Test Steps:
+1. Push new AG-CFG parameter from TABA
+2. SC downloaded and activated AG-CFG parameter
+3. Send parameter notification to Titan-C
+ 
+Expected Result:
+Titan-C should download the AG-CFG parameter, and subsequently activate the parameter when gate set to close mode.
+
+
+Actual Result:
+Titan-C does not download and activate AG-CFG parameter
+",Production,Fixed,CAT B,AG,SWAG,DMT,SWG.Q.16.12.00,Mervyn Ong,BS-39,Mark,LTA_FS_InSource,,Mervyn Ong,"During BS39 Ph2 deployment, AG-CFG parameter had been pushed down from TABA due to CBT to ABT migration RFE.
+
+PTO found out that Titan-C gates at BPLRT did not download the new AG-CFG parameter from SC.",No,NA,"This reason of introducing this defect is the reverted source code is not reviewed properly. AG-CFG format version 4 was introduced by one of the RFE in BS39. However, this RFE had been descoped, and hence the implementation should be reverted too.",Developer performs whole set parameter download and activation test.,Construction,Logic Error,,To conduct another round of code review when reverting the implementation,Esther Ong,Test case not executed,Yes,,Missing Test Case,,To ensure tester include test case base on the impact analysis
+DEF016866,29/4/2022,INC_00024334 :  SMRT : ABT : UNABLE TO DELETE RECORDS IN RAIL USER ACCESS TABLE IN NSEW RO,We cannot delete the records in ABT Rail User Access Table in NSEW RO. Please assist.,Production,Open,CAT B,TABA Application,TABA.PDMS,BOS,NA,Geetha Sira Ranganathappa,BS-39,Laura,LTA-FS-Insource,,Xu Guoneng,"funciton ID deleteParam is missed out in SMRT RO when the BS38 LDAP script was released to FT previously. 
+
+Since it has already been deployed to dev1/SIT in BS38, we couldn't identify any issue during BS39 dev1/SIT.
+",No,,"Since the deleteParam function ID has already been deployed to dev1 and SIT in previous BS (i.e. BS38), so it is not possible to identify it in these two envionments when we tested it in BS39.
+
+","The LDAP script deployed to dev1/SIT should be baselined too (currently we only create baseline for LDAP prior to FT release/deployment). 
+
+Since there are many entries to be configured for each service provider's LDAP account, we need to explore a new way to add/edit entries systematically for each service provider, so we won't miss out any entry due to manual copy-paste-modify in a single monolithic script file.
+
+Making use of excel template to generate large no. of LDAP configurations for each service provider could be a way to reduce human error.",Construction,Deployment Error,,"Issue has been fixed in production.
+Added function ID deleteParam to SMRT RO LDAP. 
+Once we have replicated all BO/RO data from FT to dev1, the Add/Edit/Delete functions of a parameter should be tested for each service provider ID respectively (e.g. sbst, nels, nsew) , instead of just based on service provider type (namely RO/BO/TO).",Esther Ong,Test case performed and defect observed but missed raising the defect.,Yes,,Missed raising the defect in ialm system,,To remind tester to raise the defect in the ialm system for issue observed during testing
+DEF016873,4/5/2022,BST parameter generated wrongly at TABA,"BST file generated at TABA was wrong/different from CBT.
+",Production,Closed,CAT B,TABA Application,TABA.PRMS,BOS,MDCS.A.02.14.01,Xu Guoneng,BS-39,Jeewan,LTA-FS-Insource,,Xu Guoneng,"The same bus service number can be defined in multiple Service Providers. The developer was not aware of this scenario to be handled due to lack of specific domain knowledge in production environment.
+Since we don’t have complete set of production data in dev environment, the test scenarios created didn't cover the this scenario which allows one bus service no. to be concurrently assigned to two different service provider IDs in production.
+Therefore, the BST blob generated may incorrectly include other service provider's info for certain 'shared' bus service no.",No,,"Lack of complete understanding of the BST data pattern (in production) as it is the most complicated parameter in SeP.
+
+paradoxically, it is *valid* to have a bus service assigned to two different service providers.","Always get the latest set of production data for integration test, as data pattern created by developers may not fully cover all the real-life  scenarios.
+",Construction,Incomplete Impact Analysis,,"Issue has been fixed in production BS39P2. 
+We always need to collect the latest production data for testing in a major parameter migration project.",Esther Ong,Test cases was not chosen based on the impact analysis.  ,No,,Test & Production Environment Difference,,"Need dev to advise or highlight the impacted area.
+Will add test cases for same bus svc number in different SPID once the FT parameters sync-ed up with production parameters."
+DEF016889,15/5/2022,Production IIB Queue overwhelmed issue cause by BOLC duplicate upload,"5 May 2022
+Due to UOB system problem, a lot of cards were added into DOD ~8.3k cards. As the result, DOD size was 280k, causing problem to messagesight -BOLC.
+It was observed that-
+-Large amount of transaction and event blob was sent to IIB. Overwhelm the system. 
+-These blob are large in size, up to 100k bytes per blob(contained more than 100 txns), as compare to normal few hundred bytes(1~2 transactions).
+-A lot of duplicate transactions/blob.
+
+
+Subsequently these blob overwhelm the subsequence system- 
+Q.ABT.IIB.DEVICE.001/002/003/
+Q.ABT.PG.IIB.001/002/003/ 
+
+Q.ABT.PGCT.IIB.001/002/003/  
+
+Q.ABT.TABA.TXNP.001
+   
+
+",Production,Closed,CAT A,Common Component,NOBE 3,EPD,BFC.A.05.22.00,Jessica Cheng Lingyu,BS-39,,,,Jessica Cheng,"2 issues were found on 05th, May, 2022 when BOLC published a big EMV Delta of Delta Blocklist parameter (280KB) to around 5000 buses at 08:15am.
+1.	BFC connected to BOLC then disconnected within 2 mins. BFC kept connection/disconnection.
+2.	BFC keep sending duplicate ABT transaction when connect to BOLC.
+The 2 issues existed from 08:15am to 11:45am until BOLC reboot at 11:45am.
+",No,,"for issue 1,  current BFC application design didnt handle the BOLC keep connect-disconnect senario.
+For issue 2,  both BFC application and MQTT Paho have retry achanism for sending. the redundent retry handling is not needed.",enhancement required to handle this exception scenario.,Design [AFC / Software],Missing Design,,,Esther Ong,Issue not observed in Test Lab.,No,,Test & Production Environment Difference,,"To explore if can simulate / verify via automation tool based on the RCA.
+"
+DEF016890,17/5/2022,The card extended information is not propagated from TABA to TVA,"MSI,
+
+Related to INC_0002414, TL proceeded to upload the concession extension via TABA GUI.
+However, we have received a customer feedback regarding not able to extension his WTCS concession card on the 9 Apr 22 (one day after direct upload to TABA).
+
+Based on TABA GUI - View Concession Extension Record, the indicator for concession extension allowed is ""No"" for CAN ID 8009 1800 0295 9500.
+
+Please check and update the reason why customer unable to do concession extension.
+
+CAN ID:
+8009 1800 0295 9500
+
+In our first cut investigation (as per 31st March incident), MSI observed the below issue
+
+a. Why the imported information to TL TVA GUI is not propagated to TABA
+On 26th April 2022, the concession extension file propagated to TVA and TABA by the EOD job EOD000006 – Web Service Import. However, due to pre-existing records in the TVA table cannot be uploaded the entire record ( 69,429 = 50,000 + 19,429 – from the files names 220426_1_1_N_50000,  220426_1_1_N_19429 respectively). In that only 6104 (3854 + 2250 – from the files names 220426_1_1_N_50000,  220426_1_1_N_19429 respectively) records were updated in the TVA table.
+
+
+b. Why the card extended information is not propagated to TVA from TABA
+The last concession extended information is propagated from TABA to TVA on 19th February 2022. From the first cut investigation, it looks like not an application issue. Still, we are investigating it.",Production,Closed,CAT B,Application,TVAS,BOS,TVA BS39,Sekhar Siripuram,BS-39,,LTA-FS-Insource,Insource has resigned,Sekhar Siripuram,"The root cause is due to the Jersey libraries being used in TVA module. 
+As part of the SS Extension project the software environment is upgraded to WAS9 and the existing Jersey libraries are not compatible with WAS9. This incompatibility was not known during project phase. There was also no test case planned for this use case to detect the issue. After detailed analysis changed the software to be compatible with Jersey 2.26 and inquiries are working fine.",No,,"The root cause is due to the Jersey libraries being used in TVA module. 
+As part of the SS Extension project the software environment is upgraded to WAS9 and the existing Jersey libraries are not compatible with WAS9. This incompatibility was not known during project phase. There was also no test case planned for this use case to detect the issue. After detailed analysis changed the software to be compatible with Jersey 2.26 and inquiries are working fine.",Intensive integration testing should be able to identify the defect during the testing environment.,Vendor Product,Product Limitation,,Consider more intensive testing for middleware upgrades,"RS138 Test Lead - Jessie Chua
+BS39 Test Lead - Esther Ong
+
+","Test case was chosen only for certain ticket types based on the impact analysis. 
+",Yes,,"Root Cause for missing test case
+As full testing needs much more time than the representative testing for the system upgrades, test cases were chosen based on the impact to the underlying middleware and interfaces. As the middleware in all tiers are the same, regression test case for Concession Extension test case was chosen only for Student card and not WTCS card.  ",,To include more ticket types in Concession Extension test cases 
+DEF016898,19/5/2022,BFC set Bluetooth name failed and caused MID could not download parameters from BFC,"BFC set Bluetooth name failed and caused MID could not download parameters from BFC
+",Production,Closed,CAT B,NOBE,NOBE 3,EPD,"BFC,A,05.22.00",Jessica Cheng Lingyu,BS-39,,,,Jessica Cheng,BFC Bluetooth chip aging. sometimes set Bluetooth name command return error from the chip.,,,the current code didnt handle the set command failure case. ,Add retry when set command failure.,Design [AFC / Software],Incomplete Impact Analysis,,,Esther Ong,Issue not observed in Test Lab.,No,,Test & Production Operation Difference,,Dev to provide more information on the root cause. 
+DEF016902,20/5/2022,"ABT_PBA Master EOD(EOD0000104) job failed due to null match seq no in match, split and discount tables-Sumathy","TABA PBA master eod job(EOD0000104) failed in production due to null match sequence number in match, split and discount tables.
+
+
+Test Steps:
+ 
+Expected Result:
+ 
+Actual Result:
+",Production,Scheduled,CAT B,TABA Application,TABA.OLTP,BOS,TABA.OLTP.39.02.01,Gilbert De Los Santos,BS-39,Shahul Dhasthagir,LTA-FS-Insource,,Gilbert de los Santos,"The issue happened due to an unusual behavior of the WebSphere application server. 
+
+NULL Match Sequence Number is by design for Fare Computation Web Service since they are not saved to the database.
+
+What we observed is that the application server seems to give the class used by the Web Service to the OLTP processing code path. This caused the OLTP process to save NULL values on the Match Sequence Number field in the database.",No,,The defect was introduced due to a different understanding on how the WebSphere application server behaves.,The issue was unexpected. There was no prior occurrence to give us information of what happened.,Design [AFC / Software],Logic Error,,"Fix has been delivered in BS40.
+
+Solution is two pronged:
+1) Set the MATCH_SEQ_NO field to NOT NULL. This will cause the fare computation process to fail and retry.
+2) Create a dummy sequence number generator for the Fare Computation Web Service.",Esther Ong,Issue not observed in Test Lab.,No,,Test & Production Environment Difference,,"To explore if can simulate / verify via automation tool based on the RCA.
+"
+DEF016957,21/6/2022,PGCT - Duplicate Posting Check,"Unlike PGEMV, there is no duplicate posting check implemented in PGCT to mitigate against the scenario where TABA is sending multiple posting files.",Production,Open,CAT B,PGCT,PGCT,EPD,PGCT BS39,Wong Mun Lai,BS-39,,,,Dorothy Pang,"What happened
+a.	TABA was doing the posting job to generate the posting file.
+b.	TABA then sent the posting file to PGCT
+c.	Before TABA can update the database, the job hanged 
+d.	MSI killed the job and re-run it 
+e.	Because the database was not updated in the previous run, the subsequent posting file ended up with same name.
+f. a) to e) happened a few times causing a few duplicate files to be sent.
+
+The duplicate posting files, although having the same filenames, have different posting reference numbers. FI only checks the duplicate reference numbers for duplicates. FI use the refund mechanism to refund the money to the patrons",No,,the current design and implementation did not cater for file duplication ,PG-CT to check for duplicate filename of posting files,Design [AFC / Software],Incomplete Impact Analysis,,,Esther Ong,Issue not observed in Test Lab.,No,,Test & Production Environment Difference,,Dev to provide more information on the root cause. 
