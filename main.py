@@ -7,6 +7,7 @@ import shutil
 import sys
 import pandas as pd
 import PySimpleGUI as sg
+import textwrap
 
 
 def settings_window(settings):
@@ -72,6 +73,92 @@ def excel_to_csv_window():
     window.close()
 
 
+def gui_settings_window():
+    layout = [[sg.T("Indicate which excel file and sheet to open")], 
+              [[sg.T("Input :", s=15, justification="r"), sg.I(key="-IN-"), sg.FileBrowse(file_types=(("Excel Files", "*.xls*"),), key='file_name')]],
+              [sg.T("Sheet Name:", s=15, justification='r'), sg.I(settings["EXCEL"]["sheet_name"], s=20, key="-SHEET_NAME-")],
+              [sg.Push(), sg.B("Open Excel Data", s=16, key='open_excel')]
+            ]
+    window = sg.Window("GUI settings", layout,
+                       modal=True, use_custom_titlebar=True)
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED:
+            break
+        if event == 'open_excel':
+            file = str(values["file_name"])
+            sheet = str(values["-SHEET_NAME-"])
+            gui_window(file, sheet)
+            break
+
+
+    window.close()
+
+def gui_window(file, sheet):
+    df = pd.read_excel(io=file, sheet_name=sheet, skiprows=1)
+    layout = [[sg.T("Row to Edit: "), sg.T("-", key='to_edit')], 
+            [sg.T("Item ID :", size=(40, 1), justification="r"), sg.I(key="item_id")],
+            [sg.T("Test Lead :", size=(40, 1), justification="r"), sg.I(key="input_1")],
+            [sg.T("Why defect was not identified during testing? :", size=(40, 1), justification="r"), sg.I(key="input_2")],
+            [sg.T("Are related requirements recorded in the BR or UCS? :", size=(40, 2), justification="r"), sg.I(key="input_3")],
+            [sg.T("If prior response is 'Yes', list down the BR or UCS document number(s) and clause identifier(s) :", size=(40, 2), justification="r"), sg.I(key="input_4")],
+            [sg.T("Primary Root Cause Classification #3 :", size=(40, 1), justification="r"), sg.I(key="input_5")],
+            [sg.T("Remark :", size=(40, 1), justification="r"), sg.I(key="input_6")],
+            [sg.T("Proposed solution to prevent recurrence :", size=(40, 1), justification="r"), sg.I(key="input_7")],
+
+            [sg.B("Search", key="search"), sg.Push(), sg.B("Update", key="Update")]
+
+        ]
+    window = sg.Window("GUI settings", layout, size=(1200, 500),
+                       modal=True, use_custom_titlebar=True)
+    idx = 0
+    while True:
+        event, values = window.read()
+        if event == sg.WINDOW_CLOSED:
+            break
+        if event == 'search':
+            idx = df[df['Item Id'] == str(values['item_id'])].index
+            if idx > 0:
+                sg.popup(" Item id: {}\n Submit Date: {}\n Title: {}\n Description: {}\n Phase Found: {}\n State: {}\n Severity: {}\n Module/Device Type Text: {}\n Module/Device Varient: {}\n OIC Team Default: {}\n Software Version: {}\n Defect Owner: {}\n Associated Prj: {}\n".format(
+                    df.loc[idx, 'Item Id'].values[0],
+                    df.loc[idx, 'Submit Date'].values[0],
+                    df.loc[idx, 'Title'].values[0],
+                    df.loc[idx, 'Description'].values[0],
+                    df.loc[idx, 'Phase Found'].values[0],
+                    df.loc[idx, 'State'].values[0],
+                    df.loc[idx, 'Severity'].values[0],
+                    df.loc[idx, 'Module/Device Type Text'].values[0],
+                    df.loc[idx, 'Module/Device Varient'].values[0],
+                    df.loc[idx, 'OIC Team Default'].values[0],
+                    df.loc[idx, 'Software Version'].values[0],
+                    df.loc[idx, 'Defect Owner'].values[0],
+                    df.loc[idx, 'Associated Prj'].values[0]))
+                window['to_edit'].update(idx.values[0])
+
+                window['input_1'].update(df.iloc[idx, 13].values[0])
+                window['input_2'].update(df.iloc[idx, 14].values[0])
+                window['input_3'].update(df.iloc[idx, 15].values[0])
+                window['input_4'].update(df.iloc[idx, 16].values[0])
+                window['input_5'].update(df.iloc[idx, 17].values[0])
+                window['input_6'].update(df.iloc[idx, 18].values[0])
+                window['input_7'].update(df.iloc[idx, 19].values[0])
+            else:
+                sg.popup("Not found")
+        if event == 'Update':
+            if idx == 0:
+                sg.popup("Select row to update")
+            else:
+                df.iloc[idx, 13] = str(values['input_1'])
+                df.iloc[idx, 14] = str(values['input_2'])
+                df.iloc[idx, 15] = str(values['input_3'])
+                df.iloc[idx, 16] = str(values['input_4'])
+                df.iloc[idx, 17] = str(values['input_5'])
+                df.iloc[idx, 18] = str(values['input_6'])
+                df.iloc[idx, 19] = str(values['input_7'])
+                sg.popup("Updated!")
+                df.to_excel("output.xlsx", sheet_name=sheet, index=False)  
+    return
+
 def main_window():
     # GUI Definition
     layout = [
@@ -80,6 +167,7 @@ def main_window():
             sg.B("Add Rows To Excel", s=16),
             sg.B("Excel To CSV", s=16),
             sg.B("Analyse Data", s=16),
+            sg.B("Open GUI", s=16),
         ],
 
     ]
@@ -95,6 +183,8 @@ def main_window():
             add_row_window()
         if event == "Excel To CSV":
             excel_to_csv_window()
+        if event == "Open GUI":
+            gui_settings_window()
 
     window.close()
 
