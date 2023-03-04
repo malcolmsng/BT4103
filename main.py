@@ -9,6 +9,13 @@ import pandas as pd
 import PySimpleGUI as sg
 
 
+def is_valid_path(filepath):
+    if filepath and Path(filepath).exists():
+        return True
+    sg.popup_error("Filepath not correct")
+    return False
+
+
 def settings_window(settings):
     layout = [[sg.T("SETTINGS")],
               [sg.T("Font Size:"), sg.I(settings["GUI"]
@@ -52,15 +59,19 @@ def add_row_window():
 
     window.close()
 
+# chose excel file --> choose csv file
+
 
 def excel_to_csv_window():
     layout = [[sg.T("Placeholder")],
-              [sg.T("Input :", s=15, justification="r"), sg.I(
-                  key="-IN-"), sg.FileBrowse(file_types=(("Excel Files", "*.xls*"),)), ],
-              [sg.T("Output Folder:", s=15, justification="r"),
-               sg.I(key="-OUT-"), sg.FolderBrowse()],
-              [sg.T("Rows To Add :", s=15, justification="r"), sg.I(default_text="XX:YY",
+              [sg.T("Excel File :", s=15, justification="r"), sg.I(
+                  key="-EXCEL-"), sg.FileBrowse(file_types=(("Excel Files", "*.xls*"),)), ],
+              [sg.T("CSV File :", s=15, justification="r"),
+               sg.I(key="-CSV-"), sg.FileBrowse(file_types=(("CSV Files", "*.csv*"),))],
+              [sg.T("Rows To Add :", s=15, justification="r"), sg.I(default_text="1:99",
                                                                     key="-ROWS-", s=8),
+               sg.T("Columns To Add :", s=15, justification="r"), sg.I(default_text="A:AZ",
+                                                                       key="-COLUMNS-", s=8),
               sg.B("Add Rows", s=16), ]]
     window = sg.Window("Add Row to Excel", layout,
                        modal=True, use_custom_titlebar=True)
@@ -68,6 +79,11 @@ def excel_to_csv_window():
         event, values = window.read()
         if event == sg.WINDOW_CLOSED:
             break
+        if event == "Add Rows":
+            excel_to_csv(excel_path=values["-EXCEL-"],
+                         csv_path=values["-CSV-"],
+                         rows=values["-ROWS-"],
+                         columns=values["-COLUMNS-"])
 
     window.close()
 
@@ -99,23 +115,29 @@ def main_window():
     window.close()
 
 
-def process_csv(csv_data):
+def excel_to_csv(excel_path, csv_path, rows, columns):
+    # xlsx_source = f"./data/{excel_data}"
+    # csv_source = xlsx_source.replace(".xlsx", ".csv")
+    start, end = rows.split(":")
+    
+    # to skip
+    start = int(start) - 1
+    end = int(end) - start
+    read_file = pd.read_excel(
+        excel_path, usecols=columns, skiprows=start, nrows=end, header= start)
+    read_file.to_csv(csv_path, mode="a", index = None,)
+
+
+def process_csv():
     # process csv data
-    df_source = f"./data/{csv_data}"
-    sample_data = pd.read_csv(df_source, skiprows=1)
+
+    sample_data = pd.read_csv(excel_path, skiprows=1)
     df = pd.DataFrame(sample_data)
     # print(df.head())
     return
 # convert xlsx to csv format
 
 # add excel rows/ sheet to csv data file
-
-
-def excel_to_csv(excel_data):
-    xlsx_source = f"./data/{excel_data}"
-    csv_source = xlsx_source.replace(".xlsx", ".csv")
-    read_file = pd.read_excel(xlsx_source)
-    read_file.to_csv(csv_source, index=None, header=True)
 
 
 if __name__ == '__main__':
