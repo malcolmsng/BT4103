@@ -8,6 +8,8 @@ import sys
 import pandas as pd
 import PySimpleGUI as sg
 import textwrap
+from pathlib import Path
+
 
 
 def is_valid_path(filepath):
@@ -66,7 +68,7 @@ def settings_window(settings):
 def gui_settings_window():
     layout = [[sg.T("Indicate which excel file and sheet to open")],
               [[sg.T("Input :", s=15, justification="r"), sg.I(
-                  key="-IN-"), sg.FileBrowse(file_types=(("Excel Files", "*.xls*"),), key='file_name')]],
+                  key="-IN-"), sg.FileBrowse(file_types=(("CSV Files", "*.csv"),), key='file_name')]],
               [sg.T("Sheet Name:", s=15, justification='r'), sg.I(
                   settings["EXCEL"]["sheet_name"], s=20, key="-SHEET_NAME-")],
               [sg.Push(), sg.B("Open Excel Data", s=16, key='open_excel')]
@@ -87,7 +89,8 @@ def gui_settings_window():
 
 
 def gui_window(file, sheet):
-    df = pd.read_excel(io=file, sheet_name=sheet, skiprows=1)
+    df = pd.read_csv(file)
+    # df = pd.read_excel(io=file, sheet_name=sheet, skiprows=0)
     layout = [[sg.T("Row to Edit: "), sg.T("-", key='to_edit')],
               [sg.T("Item ID :", size=(40, 1), justification="r"),
                sg.I(key="item_id")],
@@ -136,28 +139,29 @@ def gui_window(file, sheet):
                     df.loc[idx, 'Associated Prj'].values[0]))
                 window['to_edit'].update(idx.values[0])
 
-                window['input_1'].update(df.iloc[idx, 13].values[0])
-                window['input_2'].update(df.iloc[idx, 14].values[0])
-                window['input_3'].update(df.iloc[idx, 15].values[0])
-                window['input_4'].update(df.iloc[idx, 16].values[0])
-                window['input_5'].update(df.iloc[idx, 17].values[0])
-                window['input_6'].update(df.iloc[idx, 18].values[0])
-                window['input_7'].update(df.iloc[idx, 19].values[0])
+                window['input_1'].update(df.iloc[idx, 26].values[0])
+                window['input_2'].update(df.iloc[idx, 27].values[0])
+                window['input_3'].update(df.iloc[idx, 28].values[0])
+                window['input_4'].update(df.iloc[idx, 29].values[0])
+                window['input_5'].update(df.iloc[idx, 30].values[0])
+                window['input_6'].update(df.iloc[idx, 31].values[0])
+                window['input_7'].update(df.iloc[idx, 32].values[0])
             else:
                 sg.popup("Not found")
         if event == 'Update':
-            if idx == 0:
+            if len(idx) < 1:
                 sg.popup("Select row to update")
             else:
-                df.iloc[idx, 13] = str(values['input_1'])
-                df.iloc[idx, 14] = str(values['input_2'])
-                df.iloc[idx, 15] = str(values['input_3'])
-                df.iloc[idx, 16] = str(values['input_4'])
-                df.iloc[idx, 17] = str(values['input_5'])
-                df.iloc[idx, 18] = str(values['input_6'])
-                df.iloc[idx, 19] = str(values['input_7'])
+                df.iloc[idx, 26] = str(values['input_1'])
+                df.iloc[idx, 27] = str(values['input_2'])
+                df.iloc[idx, 28] = str(values['input_3'])
+                df.iloc[idx, 29] = str(values['input_4'])
+                df.iloc[idx, 30] = str(values['input_5'])
+                df.iloc[idx, 31] = str(values['input_6'])
+                df.iloc[idx, 32] = str(values['input_7'])
                 sg.popup("Updated!")
-                df.to_excel("output.xlsx", sheet_name=sheet, index=False)
+                # df.to_excel("output.xlsx", sheet_name=sheet, index=False)
+                df.to_csv(file, index=False)
     return
 
 
