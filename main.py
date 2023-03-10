@@ -2,12 +2,13 @@
 # all functions to be executed here
 # trying stuff out
 import os
-import json
-import shutil
-import sys
+# import json
+# import shutil
+# import sys
 import pandas as pd
 import PySimpleGUI as sg
-import textwrap
+# import textwrap
+from pathlib import Path
 
 
 def is_valid_path(filepath):
@@ -78,9 +79,13 @@ def gui_settings_window():
         if event == sg.WINDOW_CLOSED:
             break
         if event == 'open_excel':
-            file = str(values["file_name"])
-            sheet = str(values["-SHEET_NAME-"])
-            gui_window(file, sheet)
+            try:
+                file = str(values["file_name"])
+                sheet = str(values["-SHEET_NAME-"])
+                gui_window(file, sheet)
+            except ValueError:
+                sg.popup_no_titlebar("Sheet name does not exist!")
+                
             break
 
     window.close()
@@ -235,9 +240,10 @@ def analyse_data():
             #              csv_path=values["-CSV-"],
             #              rows=values["-ROWS-"],
             #              columns=values["-COLUMNS-"])
-            sample_data = pd.read_csv(
-                excel_path, skiprows=1, usecols=values["-COLUMNS-"])
-            df = pd.DataFrame(sample_data)
+            # sample_data = pd.read_csv(
+            #     excel_path, skiprows=1, usecols=values["-COLUMNS-"])
+            # df = pd.DataFrame(sample_data)
+            break
 
     window.close()
     return
